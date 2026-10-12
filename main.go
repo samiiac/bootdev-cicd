@@ -3,16 +3,17 @@ package main
 import (
 	"database/sql"
 	"embed"
+	"fmt"
+	"github.com/bootdotdev/learn-cicd-starter/internal/database"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/cors"
+	"github.com/joho/godotenv"
 	"io"
 	"log"
 	"net/http"
 	"os"
-
-	"github.com/go-chi/chi"
-	"github.com/go-chi/cors"
-	"github.com/joho/godotenv"
-
-	"github.com/bootdotdev/learn-cicd-starter/internal/database"
+	"strconv"
+	"time"
 
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
 )
@@ -31,8 +32,15 @@ func main() {
 	}
 
 	port := os.Getenv("PORT")
+
 	if port == "" {
 		log.Fatal("PORT environment variable is not set")
+	}
+
+	portNum, err := strconv.Atoi(port)
+	//gosec:disable G706
+	if err != nil {
+		log.Fatalf("Invalid port value: %s", port)
 	}
 
 	apiCfg := apiConfig{}
@@ -89,10 +97,11 @@ func main() {
 
 	router.Mount("/v1", v1Router)
 	srv := &http.Server{
-		Addr:    ":" + port,
-		Handler: router,
+		Addr:              fmt.Sprintf(":%d", portNum),
+		Handler:           router,
+		ReadHeaderTimeout: 3 * time.Second,
 	}
 
-	log.Printf("Serving on port: %s\n", port)
+	log.Printf("Serving on port: %d\n", portNum)
 	log.Fatal(srv.ListenAndServe())
 }
