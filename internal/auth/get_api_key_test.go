@@ -49,12 +49,10 @@ func TestGetAPIKey(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gotKey, gotErr := GetAPIKey(tt.headers)
 
-		
 			if gotKey != tt.expectedKey {
 				t.Errorf("GetAPIKey() gotKey = %v, want %v", gotKey, tt.expectedKey)
 			}
 
-		
 			if tt.expectedError == nil {
 				if gotErr != nil {
 					t.Errorf("GetAPIKey() unexpected error: %v", gotErr)
